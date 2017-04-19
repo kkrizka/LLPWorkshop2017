@@ -47,11 +47,11 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   wk()->addOutput(m_histEventCount);
 
   // Interesting histograms
-  h_histIBLToT=new TH1F("histIBLToT", "IBL ToT",200,0.,2000.);
+  h_histIBLToT=new TH1F("IBLToT", "IBL ToT",200,0.,2000.);
   wk()->addOutput(h_histIBLToT);
-  h_histIBLnRDO=new TH1F("histIBLnRDO", "IBL N_{RDO}",51,-0.5,50.5);
+  h_histIBLnRDO=new TH1F("IBLnRDO", "IBL N_{RDO}",51,-0.5,50.5);
   wk()->addOutput(h_histIBLnRDO);
-  h_histIBLToTavg=new TH1F("histIBLToTavg", "IBL ToT/N_{RDO}",200,0.,2000.);
+  h_histIBLToTavg=new TH1F("IBLToTavg", "IBL ToT/N_{RDO}",30,0.,15.);
   wk()->addOutput(h_histIBLToTavg);
   
   return EL::StatusCode::SUCCESS;
@@ -156,13 +156,17 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
   const xAOD::TrackMeasurementValidationContainer* clusters=0;
   ANA_CHECK(m_event->retrieve(clusters, "PixelClusters"));
 
+  int ToT, nRDO;
   for(const auto& cluster : *clusters)
     {
       if(a_layer(*cluster)!=0 || a_bec(*cluster)!=0) continue;
       //if(a_nRDO(*cluster)==0) { std::cout << "nRDO==0" << std::endl; continue; }
-      h_histIBLToT   ->Fill(a_ToT(*cluster)                  ,weight);
-      h_histIBLnRDO  ->Fill(a_nRDO(*cluster)                 ,weight);
-      h_histIBLToTavg->Fill(a_ToT(*cluster)/a_nRDO(*cluster) ,weight);
+      ToT =a_ToT(*cluster);
+      nRDO=a_nRDO(*cluster);
+
+      h_histIBLToT   ->Fill(ToT      ,weight);
+      h_histIBLnRDO  ->Fill(nRDO     ,weight);
+      h_histIBLToTavg->Fill(ToT/nRDO ,weight);
     }
 
   // Here you do everything that needs to be done on every single
