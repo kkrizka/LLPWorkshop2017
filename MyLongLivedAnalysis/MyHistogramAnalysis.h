@@ -8,6 +8,7 @@
 #include <TrigConfxAOD/xAODConfigTool.h>
 #include <TrigDecisionTool/TrigDecisionTool.h>
 
+#include <MyLongLivedAnalysis/ClusterHists.h>
 
 #include <TH1.h>
 
@@ -54,10 +55,41 @@ private:
 
   //
   // Histograms
-  TH1 *h_histIBLToT; //!
-  TH1 *h_histIBLnRDO; //!
-  TH1 *h_histIBLToTavg; //!
+  ClusterHists *h_IBL; //!
+  ClusterHists *h_IBL_eta_module[20]; //!
+  ClusterHists *h_IBL_abseta_module[10]; //!
 
+  ClusterHists *h_perIBLchip; //!
+  ClusterHists *h_perIBLchip_eta_module[20]; //!
+  ClusterHists *h_perIBLchip_abseta_module[10]; //!
+
+  ClusterHists *h_RHad_IBL; //!
+  ClusterHists *h_RHad_IBL_eta_module[20]; //!
+  ClusterHists *h_RHad_IBL_abseta_module[10]; //!
+
+  TH1 *h_nRhadron; //!
+  TH1 *h_nChRhadron; //!
+  TH1 *h_nNeRhadron; //!
+
+  TH1 *h_Rhadron_pt; //!
+  TH1 *h_Rhadron_eta; //!
+  TH1 *h_Rhadron_phi; //!
+  TH1 *h_Rhadron_m; //!
+  TH1 *h_Rhadron_p; //!
+  TH1 *h_Rhadron_decVtx_x; //!
+  TH1 *h_Rhadron_decVtx_y; //!
+  TH1 *h_Rhadron_decVtx_z; //!
+  TH1 *h_Rhadron_decVtx_t; //!
+  TH1 *h_Rhadron_decVtx_eta; //!
+  TH1 *h_Rhadron_decVtx_phi; //!
+
+  TH1 *h_nRhadtrk; //!
+  TH1 *h_Rhadtrk_pt; //!
+  TH1 *h_Rhadtrk_eta; //!
+  TH1 *h_Rhadtrk_phi; //!
+
+  TH1 *h_Rhadtrk_IBL_eta_module; //!
+  TH1 *h_Rhadtrk_IBL_abseta_module; //!
 
   // this is needed to distribute the algorithm to the workers
   ClassDef(MyHistogramAnalysis, 1);

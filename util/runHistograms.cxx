@@ -22,10 +22,10 @@ int main( int argc, char* argv[] ) {
   SH::SampleHandler sh;
 
   // use SampleHandler to scan all of the subdirectories of a directory for particular MC single file:
-  SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/mc15_13TeV.402735.PythiaRhad_AUET2BCTEQ6L1_gen_gluino_p1_2000_qq_100_1ns.DAOD_IDTRKVALID.e4732_s2821_s2183_r7772");
-  SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/data16_13TeV.00299315.calibration_PixelBeam.recon.DAOD_IDTRKVALID.r8077");
-  SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/mc15_13TeV.361203.Pythia8_A2_MSTW2008LO_ND_minbias.recon.DAOD_IDTRKVALID.e3639_s2601_s2132_r8383");
-
+  //SH::ScanDir().filePattern("DAOD_IDTRKVALID.*.root").scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632");
+  //SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/data16_13TeV.00299315.calibration_PixelBeam.recon.DAOD_IDTRKVALID.r8077");
+  //SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/mc15_13TeV.361203.Pythia8_A2_MSTW2008LO_ND_minbias.recon.DAOD_IDTRKVALID.e3639_s2601_s2132_r8383");
+  SH::ScanDir().filePattern("DAOD_IDTRKVALID.*.root").scan(sh,"/global/projecta/projectdirs/atlas/kkrizka/data/LLPWorkshop17/DAOD_IDTRKVALID");
 
   // Set the name of the input TTree. It's always "CollectionTree"
   // for xAOD files.

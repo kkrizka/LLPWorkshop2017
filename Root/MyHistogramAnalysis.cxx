@@ -1,5 +1,8 @@
 #include <MyLongLivedAnalysis/MyHistogramAnalysis.h>
 
+#include <MyLongLivedAnalysis/Helpers.h>
+
+#include <AthLinks/ElementLink.h>
 #include <EventLoop/Job.h>
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
@@ -10,7 +13,16 @@
 #include <xAODRootAccess/Init.h>
 #include <xAODTracking/TrackMeasurementValidationContainer.h>
 #include <xAODTracking/TrackParticleContainer.h>
+#include <xAODTracking/TrackStateValidationContainer.h>
+#include <xAODTruth/TruthParticleContainer.h>
+#include <xAODTruth/TruthVertex.h>
 #include <SampleHandler/MetaFields.h>
+
+#include <sstream>
+
+typedef std::vector<ElementLink< xAOD::TrackStateValidationContainer > > MeasurementsOnTrackLink;
+typedef ElementLink< xAOD::TrackMeasurementValidationContainer > TrackMeasurementValidationLink;
+typedef ElementLink< xAOD::TruthParticleContainer > TruthParticleContainerLink;
 
 // this is needed to distribute the algorithm to the workers
 ClassImp(MyHistogramAnalysis)
@@ -47,13 +59,135 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   wk()->addOutput(m_histEventCount);
 
   // Interesting histograms
-  h_histIBLToT=new TH1F("IBLToT", "IBL ToT",200,0.,2000.);
-  wk()->addOutput(h_histIBLToT);
-  h_histIBLnRDO=new TH1F("IBLnRDO", "IBL N_{RDO}",51,-0.5,50.5);
-  wk()->addOutput(h_histIBLnRDO);
-  h_histIBLToTavg=new TH1F("IBLToTavg", "IBL ToT/N_{RDO}",30,0.,15.);
-  wk()->addOutput(h_histIBLToTavg);
+  h_IBL=new ClusterHists("IBL");
+  h_IBL->initialize();
+  h_IBL->record(wk());
+
+  std::stringstream ss_name;
+  for(int i=-10; i<=9; i++)
+    {
+      ss_name << "IBL_eta_module_" << i;
+      ClusterHists *IBL_eta_module=new ClusterHists(ss_name.str());
+      IBL_eta_module->initialize();
+      IBL_eta_module->record(wk());
+      h_IBL_eta_module[i+10]=IBL_eta_module;
+      ss_name.str("");
+    }
   
+  for(int i=0; i<=9; i++)
+    {
+      ss_name << "IBL_abseta_module_" << i;
+      ClusterHists *IBL_abseta_module=new ClusterHists(ss_name.str());
+      IBL_abseta_module->initialize();
+      IBL_abseta_module->record(wk());
+      h_IBL_abseta_module[i]=IBL_abseta_module;
+      ss_name.str("");
+    }
+
+  //
+  // per pixel chip
+  h_perIBLchip=new ClusterHists("perIBLchip");
+  h_perIBLchip->initialize();
+  h_perIBLchip->record(wk());
+
+  for(int i=-10; i<=9; i++)
+    {
+      ss_name << "perIBLchip_eta_module_" << i;
+      ClusterHists *perIBLchip_eta_module=new ClusterHists(ss_name.str());
+      perIBLchip_eta_module->initialize();
+      perIBLchip_eta_module->record(wk());
+      h_perIBLchip_eta_module[i+10]=perIBLchip_eta_module;
+      ss_name.str("");
+    }
+  
+  for(int i=0; i<=9; i++)
+    {
+      ss_name << "perIBLchip_abseta_module_" << i;
+      ClusterHists *perIBLchip_abseta_module=new ClusterHists(ss_name.str());
+      perIBLchip_abseta_module->initialize();
+      perIBLchip_abseta_module->record(wk());
+      h_perIBLchip_abseta_module[i]=perIBLchip_abseta_module;
+      ss_name.str("");
+    }
+
+  //
+  // matched to track
+  h_RHad_IBL=new ClusterHists("RHad_IBL");
+  h_RHad_IBL->initialize();
+  h_RHad_IBL->record(wk());
+
+  for(int i=-10; i<=9; i++)
+    {
+      ss_name << "RHad_IBL_eta_module_" << i;
+      ClusterHists *RHad_IBL_eta_module=new ClusterHists(ss_name.str());
+      RHad_IBL_eta_module->initialize();
+      RHad_IBL_eta_module->record(wk());
+      h_RHad_IBL_eta_module[i+10]=RHad_IBL_eta_module;
+      ss_name.str("");
+    }
+  
+  for(int i=0; i<=9; i++)
+    {
+      ss_name << "RHad_IBL_abseta_module_" << i;
+      ClusterHists *RHad_IBL_abseta_module=new ClusterHists(ss_name.str());
+      RHad_IBL_abseta_module->initialize();
+      RHad_IBL_abseta_module->record(wk());
+      h_RHad_IBL_abseta_module[i]=RHad_IBL_abseta_module;
+      ss_name.str("");
+    }
+
+
+  //
+  // Truth histograms
+  h_nRhadron =new TH1F("nRhadron",  ";N_{R-hadron}",6,-0.5,5.5);
+  h_nChRhadron =new TH1F("nChRhadron",  ";N_{Charged R-hadron}",6,-0.5,5.5);
+  h_nNeRhadron =new TH1F("nNeRhadron",  ";N_{Neutral R-hadron}",6,-0.5,5.5);
+
+  h_Rhadron_pt =new TH1F("Rhadron_pt",  ";R-hadron p_{T} [GeV]",100,0,1000);
+  h_Rhadron_eta=new TH1F("Rhadron_eta", ";R-hadron #eta"       ,20,-5,5);
+  h_Rhadron_phi=new TH1F("Rhadron_phi", ";R-hadron #phi"       ,20,-2*TMath::Pi(),2*TMath::Pi());
+  h_Rhadron_m  =new TH1F("Rhadron_m",   ";R-hadron m [GeV]"    ,500,0,5000);
+  h_Rhadron_p  =new TH1F("Rhadron_p",   ";R-hadron p [GeV]"    ,500,0,1000);
+
+  h_Rhadron_decVtx_x  =new TH1F("Rhadron_decVtx_x", ";R-hadron Decay Vertex x [mm]",500,0,1000);
+  h_Rhadron_decVtx_y  =new TH1F("Rhadron_decVtx_y", ";R-hadron Decay Vertex y [mm]",500,0,1000);
+  h_Rhadron_decVtx_z  =new TH1F("Rhadron_decVtx_z", ";R-hadron Decay Vertex z [mm]",500,0,1000);
+  h_Rhadron_decVtx_t  =new TH1F("Rhadron_decVtx_t", ";R-hadron Decay Vertex Time [ps]",500,0,1000);
+  h_Rhadron_decVtx_eta  =new TH1F("Rhadron_decVtx_eta", ";R-hadron Decay Vertex #eta",20,-5,5);
+  h_Rhadron_decVtx_phi  =new TH1F("Rhadron_decVtx_phi", ";R-hadron Decay Vertex #phi",20,-2*TMath::Pi(),2*TMath::Pi());
+
+  wk()->addOutput(h_nRhadron);
+  wk()->addOutput(h_nChRhadron);
+  wk()->addOutput(h_nNeRhadron);
+
+  wk()->addOutput(h_Rhadron_pt);
+  wk()->addOutput(h_Rhadron_eta);
+  wk()->addOutput(h_Rhadron_phi);
+  wk()->addOutput(h_Rhadron_m);
+  wk()->addOutput(h_Rhadron_p);
+  wk()->addOutput(h_Rhadron_decVtx_x);
+  wk()->addOutput(h_Rhadron_decVtx_y);
+  wk()->addOutput(h_Rhadron_decVtx_z);
+  wk()->addOutput(h_Rhadron_decVtx_t);
+  wk()->addOutput(h_Rhadron_decVtx_eta);
+  wk()->addOutput(h_Rhadron_decVtx_phi);
+
+  h_nRhadtrk   =new TH1F("nRhadtrk",    ";N_{R-hadron tracks}",6,-0.5,5.5);
+  h_Rhadtrk_pt =new TH1F("Rhadtrk_pt",  ";R-hadron track p_{T} [GeV]",100,0,1000);
+  h_Rhadtrk_eta=new TH1F("Rhadtrk_eta", ";R-hadron track #eta"       ,20,-5,5);
+  h_Rhadtrk_phi=new TH1F("Rhadtrk_phi", ";R-hadron track #phi"       ,20,-2*TMath::Pi(),2*TMath::Pi());
+
+  h_Rhadtrk_IBL_eta_module   =new TH1F("Rhadtrk_IBL_eta_module"   , ";R-hadron track IBL #eta module",21,-10.5,10.5);
+  h_Rhadtrk_IBL_abseta_module=new TH1F("Rhadtrk_IBL_abseta_module", ";R-hadron track IBL #eta module",11, -0.5,10.5);
+
+  wk()->addOutput(h_nRhadtrk);
+  wk()->addOutput(h_Rhadtrk_pt);
+  wk()->addOutput(h_Rhadtrk_eta);
+  wk()->addOutput(h_Rhadtrk_phi);
+
+  wk()->addOutput(h_Rhadtrk_IBL_eta_module);
+  wk()->addOutput(h_Rhadtrk_IBL_abseta_module);
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -127,8 +261,10 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
 {
   static const SG::AuxElement::ConstAccessor<int> a_bec("bec");
   static const SG::AuxElement::ConstAccessor<int> a_layer("layer");
-  static const SG::AuxElement::ConstAccessor<int> a_ToT("ToT");
+  static const SG::AuxElement::ConstAccessor<int> a_eta_module("eta_module");
+  static const SG::AuxElement::ConstAccessor<int> a_phi_module("phi_module");
   static const SG::AuxElement::ConstAccessor<int> a_nRDO("nRDO");
+  static const SG::AuxElement::ConstAccessor<std::vector<int> > a_rdo_tot("rdo_tot");
 
   //
   // EventInfo
@@ -150,33 +286,184 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
   m_histEventCount->Fill(4, mcweight);
   m_histEventCount->Fill(6, mcweight*mcweight);
 
-  const xAOD::TrackParticleContainer* tracks=0;
-  ANA_CHECK(m_event->retrieve(tracks, "InDetTrackParticles"));
+  //
+  // Truth histograms
+  //std::cout << "TRUTH HISTOGRAMS" << std::endl;
+  if(isMC)
+    {
+      int nRhadron=0;
+      int nChRhadron=0;
+      int nNeRhadron=0;
 
+      const xAOD::TruthParticleContainer* truths=0;
+      ANA_CHECK(m_event->retrieve(truths, "TruthParticles"));
+      //std::cout << "New Event" << std::endl;
+      for(const auto& truth : *truths)
+	{
+	  if(isRHadron(*truth))
+	    {
+	      //std::cout << "FOUND R HADRON " << truth->decayVtx() << " and " << truth->hasDecayVtx() << std::endl;
+	      if(truth->hasDecayVtx() && truth->decayVtx()->t()==0) continue;
+	      // std::cout << "FOUND ONE " << truth->p4().M()/1e3 << " with PDGID=" << truth->pdgId() << std::endl;
+	      // std::cout << "pT = " << truth->p4().Pt()/1e3 << " eta = " << truth->p4().Eta() << " phi = " << truth->p4().Phi() << std::endl;
+	      // std::cout << "Decay Vertex (x,y,z)     = (" << truth->decayVtx()->x() << "," << truth->decayVtx()->y() << "," << truth->decayVtx()->z() << ")" << std::endl;
+	      // std::cout << "             (t,eta,phi) = (" << truth->decayVtx()->t() << "," << truth->decayVtx()->eta() << "," << truth->decayVtx()->phi() << ")" << std::endl;
+
+	      nRhadron++;
+	      if(isChargedRHadron(*truth)) nChRhadron++;
+	      else nNeRhadron++;
+
+	      h_Rhadron_pt ->Fill(truth->p4().Pt() /1000., weight);
+	      h_Rhadron_eta->Fill(truth->p4().Eta()      , weight);
+	      h_Rhadron_phi->Fill(truth->p4().Phi()      , weight);
+	      h_Rhadron_m  ->Fill(truth->p4().M()  /1000., weight);
+	      h_Rhadron_p  ->Fill(truth->p4().P()  /1000., weight);
+
+	      if(truth->hasDecayVtx())
+		{
+		  //std::cout << "DECAY " << truth->decayVtx() << std::endl;
+		  h_Rhadron_decVtx_x  ->Fill(truth->decayVtx()->x(), weight);
+		  h_Rhadron_decVtx_y  ->Fill(truth->decayVtx()->y(), weight);
+		  h_Rhadron_decVtx_z  ->Fill(truth->decayVtx()->z(), weight);
+
+		  h_Rhadron_decVtx_t  ->Fill(truth->decayVtx()->t()  , weight);
+		  h_Rhadron_decVtx_eta->Fill(truth->decayVtx()->eta(), weight);
+		  h_Rhadron_decVtx_phi->Fill(truth->decayVtx()->phi(), weight);
+		}
+	      //std::cout << "DONE" << std::endl;
+	    }
+	}
+      h_nRhadron->Fill(nRhadron, weight);
+      h_nChRhadron->Fill(nChRhadron, weight);
+      h_nNeRhadron->Fill(nNeRhadron, weight);
+    }
+
+  //
+  // Cluster histograms
+  //std::cout << "CLUSTER HISTOGRAMS" << std::endl;
   const xAOD::TrackMeasurementValidationContainer* clusters=0;
   ANA_CHECK(m_event->retrieve(clusters, "PixelClusters"));
 
-  int ToT, nRDO;
+  int nRDO, phi_module, eta_module, abseta_module;
+  std::vector<xAOD::TrackMeasurementValidation*> clustersIn      [20][14];
   for(const auto& cluster : *clusters)
     {
       if(a_layer(*cluster)!=0 || a_bec(*cluster)!=0) continue;
       //if(a_nRDO(*cluster)==0) { std::cout << "nRDO==0" << std::endl; continue; }
-      ToT =a_ToT(*cluster);
+      phi_module=a_phi_module(*cluster);
+      eta_module=a_eta_module(*cluster);
+      abseta_module=(eta_module>=0)?eta_module:-eta_module-1;
       nRDO=a_nRDO(*cluster);
 
-      h_histIBLToT   ->Fill(ToT      ,weight);
-      h_histIBLnRDO  ->Fill(nRDO     ,weight);
-      h_histIBLToTavg->Fill(ToT/nRDO ,weight);
+      clustersIn[10+eta_module][phi_module].push_back(cluster);
+
+      if(nRDO<=3) continue;
+
+      h_IBL->execute(*cluster, weight);
+      h_IBL_eta_module   [eta_module+10]->execute(*cluster, weight);
+      h_IBL_abseta_module[abseta_module]->execute(*cluster, weight);
     }
 
+  // Calculate per chip stuff
+  std::vector<int> rdo_tot;
+  //std::cout << "PER CHIP" << std::endl;
+  for(abseta_module=0; abseta_module<10; abseta_module++)
+    {
+      for(phi_module=0; phi_module<14; phi_module++)
+	{
+	  std::vector<int> tot_rdo_tot;
+
+	  // right
+	  tot_rdo_tot.clear();
+	  for(const auto& cluster : clustersIn[10+abseta_module][phi_module])
+	    {
+	      if(!a_rdo_tot.isAvailable(*cluster)) continue;
+	      rdo_tot=a_rdo_tot(*cluster);
+	      tot_rdo_tot.insert(tot_rdo_tot.end(),rdo_tot.begin(), rdo_tot.end());
+	    }
+	  h_perIBLchip->execute(tot_rdo_tot, weight);
+	  h_perIBLchip_eta_module[10+abseta_module]->execute(tot_rdo_tot, weight);
+	  h_perIBLchip_abseta_module[abseta_module]->execute(tot_rdo_tot, weight);
+
+	  // left
+	  tot_rdo_tot.clear();
+	  for(const auto& cluster : clustersIn[10-abseta_module-1][phi_module])
+	    {
+	      if(!a_rdo_tot.isAvailable(*cluster)) continue;
+	      rdo_tot=a_rdo_tot(*cluster);
+	      tot_rdo_tot.insert(tot_rdo_tot.end(),rdo_tot.begin(), rdo_tot.end());
+	    }
+	  h_perIBLchip->execute(tot_rdo_tot, weight);
+	  h_perIBLchip_eta_module[10-abseta_module-1]->execute(tot_rdo_tot, weight);
+	  h_perIBLchip_abseta_module[abseta_module]  ->execute(tot_rdo_tot, weight);
+	}
+    }
+
+  //
+  // Track histograms
+  //std::cout << "TRACK HISTOGRAMS" << std::endl;
+  const xAOD::TrackParticleContainer* tracks=0;
+  ANA_CHECK(m_event->retrieve(tracks, "InDetTrackParticles"));
+
+  uint nRhadtrk=0;
+  // std::cout << "TRACK LIST" << std::endl;
+  for(const auto& track : *tracks)
+    {
+      // Determine if is Rhadron
+      const xAOD::TruthParticle *truth=getTruthParticle(track);
+      if(truth==0 || !isChargedRHadron(*truth)) continue;
+
+      // std::cout << "TRACK pt,eta,phi,d0,z0 = " << track->p4().Pt() << "," << track->p4().Eta() << "," << track->p4().Phi() << "," << track->d0() << "," << track->z0() << std::endl;
+      // std::cout << "\tradiusOfFirstHit = " << track->radiusOfFirstHit() << std::endl;
+      // std::cout << "\thitPattern = b" << std::bitset<32>(track->hitPattern()) << std::endl;
+      
+      nRhadtrk++;
+      h_Rhadtrk_pt ->Fill(track->p4().Pt() , weight);
+      h_Rhadtrk_eta->Fill(track->p4().Eta(), weight);
+      h_Rhadtrk_phi->Fill(track->p4().Phi(), weight);
+
+      // std::cout << "FOUND ONE " << truth->p4().M()/1e3 << " with PDGID=" << truth->pdgId() << std::endl;
+      // std::cout << "pT = " << truth->p4().Pt()/1e3 << " eta = " << truth->p4().Eta() << " phi = " << truth->p4().Phi() << std::endl;
+      // std::cout << "Decay Vertex (x,y,z)     = (" << truth->decayVtx()->x() << "," << truth->decayVtx()->y() << "," << truth->decayVtx()->z() << ")" << std::endl;
+      // std::cout << "             (t,eta,phi) = (" << truth->decayVtx()->t() << "," << truth->decayVtx()->eta() << "," << truth->decayVtx()->phi() << ")" << std::endl;
+
+      // Loop over clusters
+      if( track->isAvailable< MeasurementsOnTrackLink >( "msosLink" ) ) 
+  	{
+  	  for ( const auto& msos : track->auxdataConst< MeasurementsOnTrackLink > ("msosLink") ) 
+  	    {
+  	      if( (*msos)->detType() == 1 )
+  		{
+  		  //it's a measurement from pixel detector
+		  TrackMeasurementValidationLink clusterLink= (*msos)->trackMeasurementValidationLink();
+		  if(!clusterLink.isValid()) continue;
+		  const xAOD::TrackMeasurementValidation* cluster = *clusterLink;
+		  if(a_layer(*cluster)!=0 || a_bec(*cluster)!=0) continue; // Not IBL
+
+		  eta_module   =a_eta_module(*cluster);
+		  abseta_module=(eta_module>=0)?eta_module:-eta_module-1;
+
+		  h_RHad_IBL->execute(*cluster, weight);
+		  h_RHad_IBL_eta_module   [eta_module+10]->execute(*cluster, weight);
+		  h_RHad_IBL_abseta_module[abseta_module]->execute(*cluster, weight);
+
+		  h_Rhadtrk_IBL_eta_module   ->Fill(eta_module   , weight);
+		  h_Rhadtrk_IBL_abseta_module->Fill(abseta_module, weight);
+  		}
+  	    }
+  	}
+    }
+
+  h_nRhadtrk->Fill(nRhadtrk, weight);
+  //std::cout << "nRhadtrk = " << nRhadtrk << std::endl;
+
+  //std::cout << "DONE" << std::endl;
   // Here you do everything that needs to be done on every single
   // events, e.g. read input variables, apply cuts, and fill
   // histograms and trees.  This is where most of your actual analysis
   // code will go.
   return EL::StatusCode::SUCCESS;
 }
-
-
 
 
 
@@ -204,6 +491,20 @@ EL::StatusCode MyHistogramAnalysis :: finalize ()
     delete m_trigDecisionTool;
     m_trigDecisionTool = 0;
   }
+
+  //
+  // Cleanup histograms
+  h_IBL->finalize();
+  for(int i=-10; i<=9; i++) h_IBL_eta_module[i+10]->finalize();
+  for(int i=0; i<=9; i++) h_IBL_abseta_module[i]->finalize();
+
+  h_perIBLchip->finalize();
+  for(int i=-10; i<=9; i++) h_perIBLchip_eta_module[i+10]->finalize();
+  for(int i=0; i<=9; i++) h_perIBLchip_abseta_module[i]->finalize();
+
+  h_RHad_IBL->finalize();
+  for(int i=-10; i<=9; i++) h_RHad_IBL_eta_module[i+10]->finalize();
+  for(int i=0; i<=9; i++) h_RHad_IBL_abseta_module[i]->finalize();
 
   return EL::StatusCode::SUCCESS;
 }
