@@ -7,7 +7,7 @@
 #include "SampleHandler/DiskListLocal.h"
 #include <TSystem.h>
 
-#include "MyLongLivedAnalysis/MyHistogramAnalysis.h"
+#include "LLPWorkshop2017/MyHistogramAnalysis.h"
 
 int main( int argc, char* argv[] ) {
 

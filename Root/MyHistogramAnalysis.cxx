@@ -1,6 +1,6 @@
-#include <MyLongLivedAnalysis/MyHistogramAnalysis.h>
+#include <LLPWorkshop2017/MyHistogramAnalysis.h>
 
-#include <MyLongLivedAnalysis/Helpers.h>
+#include <LLPWorkshop2017/Helpers.h>
 
 #include <AthLinks/ElementLink.h>
 #include <EventLoop/Job.h>

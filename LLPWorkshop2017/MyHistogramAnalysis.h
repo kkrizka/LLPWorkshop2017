@@ -1,5 +1,5 @@
-#ifndef MyLongLivedAnalysis_MyHistogramAnalysis_H
-#define MyLongLivedAnalysis_MyHistogramAnalysis_H
+#ifndef LLPWorkshop2017_MyHistogramAnalysis_H
+#define LLPWorkshop2017_MyHistogramAnalysis_H
 
 #include <EventLoop/Algorithm.h>
 
@@ -8,7 +8,7 @@
 #include <TrigConfxAOD/xAODConfigTool.h>
 #include <TrigDecisionTool/TrigDecisionTool.h>
 
-#include <MyLongLivedAnalysis/ClusterHists.h>
+#include <LLPWorkshop2017/ClusterHists.h>
 
 #include <TH1.h>
 
