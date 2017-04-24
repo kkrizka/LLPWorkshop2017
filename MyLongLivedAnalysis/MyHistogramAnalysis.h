@@ -67,6 +67,10 @@ private:
   ClusterHists *h_RHad_IBL_eta_module[20]; //!
   ClusterHists *h_RHad_IBL_abseta_module[10]; //!
 
+  ClusterHists *h_nonRHad_IBL; //!
+  ClusterHists *h_nonRHad_IBL_eta_module[20]; //!
+  ClusterHists *h_nonRHad_IBL_abseta_module[10]; //!
+
   TH1 *h_nRhadron; //!
   TH1 *h_nChRhadron; //!
   TH1 *h_nNeRhadron; //!

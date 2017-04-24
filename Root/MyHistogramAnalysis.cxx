@@ -136,6 +136,32 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
       ss_name.str("");
     }
 
+  //
+  // matched to track
+  h_nonRHad_IBL=new ClusterHists("nonRHad_IBL");
+  h_nonRHad_IBL->initialize();
+  h_nonRHad_IBL->record(wk());
+
+  for(int i=-10; i<=9; i++)
+    {
+      ss_name << "nonRHad_IBL_eta_module_" << i;
+      ClusterHists *nonRHad_IBL_eta_module=new ClusterHists(ss_name.str());
+      nonRHad_IBL_eta_module->initialize();
+      nonRHad_IBL_eta_module->record(wk());
+      h_nonRHad_IBL_eta_module[i+10]=nonRHad_IBL_eta_module;
+      ss_name.str("");
+    }
+  
+  for(int i=0; i<=9; i++)
+    {
+      ss_name << "nonRHad_IBL_abseta_module_" << i;
+      ClusterHists *nonRHad_IBL_abseta_module=new ClusterHists(ss_name.str());
+      nonRHad_IBL_abseta_module->initialize();
+      nonRHad_IBL_abseta_module->record(wk());
+      h_nonRHad_IBL_abseta_module[i]=nonRHad_IBL_abseta_module;
+      ss_name.str("");
+    }
+
 
   //
   // Truth histograms
@@ -209,16 +235,14 @@ EL::StatusCode MyHistogramAnalysis :: fileExecute ()
   const xAOD::CutBookkeeper* allEventsCBK = 0;
   int maxCycle = -1;
   for (const auto& cbk: *completeCBC) {
-    std::cout << cbk->name() << " " << cbk->inputStream() << std::endl;
-    if (cbk->cycle() > maxCycle && cbk->name() == "AllExecutedEvents" && cbk->inputStream() == "StreamAOD") {
+    if (cbk->cycle() > maxCycle && cbk->name() == "AllExecutedEvents" && cbk->inputStream() == "StreamESD") {
       allEventsCBK = cbk;
       maxCycle = cbk->cycle();
     }
   }
-  std::cout << "GOT ALL EVENTS " << allEventsCBK << std::endl;
-  // m_histEventCount->Fill(1, allEventsCBK->nAcceptedEvents());
-  // m_histEventCount->Fill(3, allEventsCBK->sumOfEventWeights());
-  // m_histEventCount->Fill(5, allEventsCBK->sumOfEventWeightsSquared());
+  m_histEventCount->Fill(1, allEventsCBK->nAcceptedEvents());
+  m_histEventCount->Fill(3, allEventsCBK->sumOfEventWeights());
+  m_histEventCount->Fill(5, allEventsCBK->sumOfEventWeightsSquared());
 
   // Here you do everything that needs to be done exactly once for every
   // single file, e.g. collect a list of all lumi-blocks processed
@@ -411,16 +435,19 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
     {
       // Determine if is Rhadron
       const xAOD::TruthParticle *truth=getTruthParticle(track);
-      if(truth==0 || !isChargedRHadron(*truth)) continue;
+      bool isRhad=(truth!=0 && isChargedRHadron(*truth));
 
       // std::cout << "TRACK pt,eta,phi,d0,z0 = " << track->p4().Pt() << "," << track->p4().Eta() << "," << track->p4().Phi() << "," << track->d0() << "," << track->z0() << std::endl;
       // std::cout << "\tradiusOfFirstHit = " << track->radiusOfFirstHit() << std::endl;
       // std::cout << "\thitPattern = b" << std::bitset<32>(track->hitPattern()) << std::endl;
       
-      nRhadtrk++;
-      h_Rhadtrk_pt ->Fill(track->p4().Pt() , weight);
-      h_Rhadtrk_eta->Fill(track->p4().Eta(), weight);
-      h_Rhadtrk_phi->Fill(track->p4().Phi(), weight);
+      if(isRhad)
+	{
+	  nRhadtrk++;
+	  h_Rhadtrk_pt ->Fill(track->p4().Pt() , weight);
+	  h_Rhadtrk_eta->Fill(track->p4().Eta(), weight);
+	  h_Rhadtrk_phi->Fill(track->p4().Phi(), weight);
+	}
 
       // std::cout << "FOUND ONE " << truth->p4().M()/1e3 << " with PDGID=" << truth->pdgId() << std::endl;
       // std::cout << "pT = " << truth->p4().Pt()/1e3 << " eta = " << truth->p4().Eta() << " phi = " << truth->p4().Phi() << std::endl;
@@ -443,12 +470,21 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
 		  eta_module   =a_eta_module(*cluster);
 		  abseta_module=(eta_module>=0)?eta_module:-eta_module-1;
 
-		  h_RHad_IBL->execute(*cluster, weight);
-		  h_RHad_IBL_eta_module   [eta_module+10]->execute(*cluster, weight);
-		  h_RHad_IBL_abseta_module[abseta_module]->execute(*cluster, weight);
+		  if(isRhad)
+		    {
+		      h_RHad_IBL->execute(*cluster, weight);
+		      h_RHad_IBL_eta_module   [eta_module+10]->execute(*cluster, weight);
+		      h_RHad_IBL_abseta_module[abseta_module]->execute(*cluster, weight);
 
-		  h_Rhadtrk_IBL_eta_module   ->Fill(eta_module   , weight);
-		  h_Rhadtrk_IBL_abseta_module->Fill(abseta_module, weight);
+		      h_Rhadtrk_IBL_eta_module   ->Fill(eta_module   , weight);
+		      h_Rhadtrk_IBL_abseta_module->Fill(abseta_module, weight);
+		    }
+		  else
+		    {
+		      h_nonRHad_IBL->execute(*cluster, weight);
+		      h_nonRHad_IBL_eta_module   [eta_module+10]->execute(*cluster, weight);
+		      h_nonRHad_IBL_abseta_module[abseta_module]->execute(*cluster, weight);
+		    }
   		}
   	    }
   	}
@@ -505,6 +541,10 @@ EL::StatusCode MyHistogramAnalysis :: finalize ()
   h_RHad_IBL->finalize();
   for(int i=-10; i<=9; i++) h_RHad_IBL_eta_module[i+10]->finalize();
   for(int i=0; i<=9; i++) h_RHad_IBL_abseta_module[i]->finalize();
+
+  h_nonRHad_IBL->finalize();
+  for(int i=-10; i<=9; i++) h_nonRHad_IBL_eta_module[i+10]->finalize();
+  for(int i=0; i<=9; i++) h_nonRHad_IBL_abseta_module[i]->finalize();
 
   return EL::StatusCode::SUCCESS;
 }
