@@ -25,7 +25,7 @@ int main( int argc, char* argv[] ) {
   //SH::ScanDir().filePattern("DAOD_IDTRKVALID.*.root").scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632");
   //SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/data16_13TeV.00299315.calibration_PixelBeam.recon.DAOD_IDTRKVALID.r8077");
   //SH::ScanDir().scan(sh,"/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/mc15_13TeV.361203.Pythia8_A2_MSTW2008LO_ND_minbias.recon.DAOD_IDTRKVALID.e3639_s2601_s2132_r8383");
-  SH::ScanDir().filePattern("DAOD_IDTRKVALID.*.root").scan(sh,"/global/projecta/projectdirs/atlas/kkrizka/data/LLPWorkshop17/DAOD_IDTRKVALID");
+  SH::ScanDir().filePattern("*.DAOD_IDTRKVALID.root").scan(sh,"/global/projecta/projectdirs/atlas/kkrizka/data/LLPWorkshop17/DAOD_IDTRKVALID");
 
   // Set the name of the input TTree. It's always "CollectionTree"
   // for xAOD files.
