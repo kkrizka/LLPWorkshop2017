@@ -29,12 +29,17 @@ private:
   TH1 *h_ToTmin;
   TH1 *h_ToTmax;
 
+  TH1 *h_nED;
   TH1 *h_ED;
   TH1 *h_EDavg;
   TH1 *h_EDmin;
   TH1 *h_EDmax;
+  TH1 *h_EDminnorm;
+  TH1 *h_EDmaxnorm;
 
   TH2 *h_ToTvsED;
+  TH2 *h_ToTmaxvsEDmaxnorm;
+  TH2 *h_ToTminvsEDminnorm;
 };
 
 #endif // CLUSTERHISTS_H_

@@ -15,12 +15,17 @@ void ClusterHists::record(EL::Worker *wk)
   wk->addOutput(h_ToTmin);
   wk->addOutput(h_ToTmax);
 
+  wk->addOutput(h_nED);
   wk->addOutput(h_ED);
   wk->addOutput(h_EDavg);
   wk->addOutput(h_EDmin);
   wk->addOutput(h_EDmax);
+  wk->addOutput(h_EDminnorm);
+  wk->addOutput(h_EDmaxnorm);
 
   wk->addOutput(h_ToTvsED);
+  wk->addOutput(h_ToTminvsEDminnorm);
+  wk->addOutput(h_ToTmaxvsEDmaxnorm);
 }
 
 void ClusterHists::initialize()
@@ -32,43 +37,58 @@ void ClusterHists::initialize()
   h_ToTmin=new TH1F((m_name+"/ToTmin").c_str(),";min(Pixel ToT)"     , 16, -0.5 ,  15.5);
   h_ToTmax=new TH1F((m_name+"/ToTmax").c_str(),";max(Pixel ToT)"     , 16, -0.5 ,  15.5);
 
-  h_ED   =new TH1F((m_name+"/ED").c_str(),   ";Cluster ED"        , 100, 0. ,5.);
-  h_EDavg=new TH1F((m_name+"/EDavg").c_str(),";Cluster ED/N_{RDO}", 100, 0. ,5.);
-  h_EDmin=new TH1F((m_name+"/EDmin").c_str(),";min(Pixel ED)"     , 100, 0. ,5.);
-  h_EDmax=new TH1F((m_name+"/EDmax").c_str(),";max(Pixel ED)"     , 100, 0. ,5.);
+  h_nED  =new TH1F((m_name+"/nED").c_str(),  ";N_{hits}"           ,  21, -0.5 ,20.5);
+  h_ED   =new TH1F((m_name+"/ED").c_str(),   ";Cluster ED"         , 100,  0.   ,5.);
+  h_EDavg=new TH1F((m_name+"/EDavg").c_str(),";Cluster ED/N_{hits}", 100,  0.   ,5.);
+  h_EDmin=new TH1F((m_name+"/EDmin").c_str(),";min(Cluster ED)"    , 100,  0.   ,5.);
+  h_EDmax=new TH1F((m_name+"/EDmax").c_str(),";max(Cluster ED)"    , 100,  0.   ,5.);
+  h_EDminnorm=new TH1F((m_name+"/EDminnorm").c_str(),";min(Cluster ED)/size Z"    , 100,  0.   ,5.);
+  h_EDmaxnorm=new TH1F((m_name+"/EDmaxnorm").c_str(),";max(Cluster ED)/size Z"    , 100,  0.   ,5.);
 
-  h_ToTvsED=new TH2F((m_name+"/ToTvsED").c_str(),";Pixel ED;Pixel ToT", 1000, -5. ,5., 200, 0., 2000.);
+  h_ToTvsED=new TH2F((m_name+"/ToTvsED").c_str(),";Cluster ED;Cluster ToT", 500, 0. ,5., 200, 0., 2000.);
+  h_ToTmaxvsEDmaxnorm=new TH2F((m_name+"/ToTmaxvsEDmaxnorm").c_str(),";max(Cluster ED)/size Z;max(Pixel ToT)", 500, 0. ,5., 16, -0.5 ,  15.5);
+  h_ToTminvsEDminnorm=new TH2F((m_name+"/ToTminvsEDminnorm").c_str(),";min(Cluster ED)/size Z;min(Pixel ToT)", 500, 0. ,5., 16, -0.5 ,  15.5);
 }
 
 void ClusterHists::execute(const xAOD::TrackMeasurementValidation& cluster, double weight)
 { 
   static const SG::AuxElement::ConstAccessor<int> a_ToT("ToT");
   static const SG::AuxElement::ConstAccessor<int> a_nRDO("nRDO");
+  static const SG::AuxElement::ConstAccessor<int> a_sizeZ("sizeZ");
   static const SG::AuxElement::ConstAccessor<std::vector<int> > a_rdo_tot("rdo_tot");
   static const SG::AuxElement::ConstAccessor<std::vector<float> > a_sihit_energyDeposit("sihit_energyDeposit");
 
   int ToT =a_ToT (cluster);
   int nRDO=a_nRDO(cluster);
+  int sizeZ=a_sizeZ(cluster);
 
   h_ToT   ->Fill(ToT                        ,weight);
   h_nRDO  ->Fill(nRDO                       ,weight);
   h_ToTavg->Fill(((float)ToT)/((float)nRDO) ,weight);
 
-  // pixel hit info
+  //
+  // pixel hits
+  float ToTmax=0.;
+  float ToTmin=0.;
   if(a_rdo_tot.isAvailable(cluster))
     {
       std::vector<int> rdo_tot=a_rdo_tot(cluster);
       if(rdo_tot.size()>0)
 	{
 	  auto minmax_tot=std::minmax_element(rdo_tot.begin(), rdo_tot.end());
-	  h_ToTmin->Fill(*minmax_tot.first ,weight);
-	  h_ToTmax->Fill(*minmax_tot.second,weight);
+	  ToTmin=*minmax_tot.first;
+	  ToTmax=*minmax_tot.second;
+	  h_ToTmin->Fill(ToTmin ,weight);
+	  h_ToTmax->Fill(ToTmax ,weight);
 	}
     }
 
   //
   // energy deposits
   float ED=0.;
+  float EDmin=0.;
+  float EDmax=0.;
+  int nED=0;
   if(a_sihit_energyDeposit.isAvailable(cluster))
     {
       std::vector<float> sihit_energyDeposit=a_sihit_energyDeposit(cluster);
@@ -76,27 +96,33 @@ void ClusterHists::execute(const xAOD::TrackMeasurementValidation& cluster, doub
 	{
 	  ED=std::accumulate(sihit_energyDeposit.begin(), sihit_energyDeposit.end(), 0.);
 	  auto minmax_ed=std::minmax_element(sihit_energyDeposit.begin(), sihit_energyDeposit.end());
-	  h_ED->Fill(ED ,weight);
-	  h_EDavg->Fill(ED/sihit_energyDeposit.size() ,weight);
-	  h_EDmin->Fill(*minmax_ed.first ,weight);
-	  h_EDmax->Fill(*minmax_ed.second,weight);
-	}
-    }
 
-  if(a_rdo_tot.isAvailable(cluster))
-    {
-      std::vector<int> rdo_tot=a_rdo_tot(cluster);
-      if(rdo_tot.size()>0)
-	{
-	  auto minmax_tot=std::minmax_element(rdo_tot.begin(), rdo_tot.end());
-	  h_ToTmin->Fill(*minmax_tot.first ,weight);
-	  h_ToTmax->Fill(*minmax_tot.second,weight);
+	  EDmin=*minmax_ed.first;
+	  EDmax=*minmax_ed.second;
+
+	  nED=sihit_energyDeposit.size();
+
+	  h_nED  ->Fill(nED ,weight);
+	  h_ED   ->Fill(ED ,weight);
+	  h_EDavg->Fill(ED/nED ,weight);
+	  h_EDmin->Fill(EDmin ,weight);
+	  h_EDmax->Fill(EDmax ,weight);
+	  h_EDminnorm->Fill(EDmin/sizeZ ,weight);
+	  h_EDmaxnorm->Fill(EDmax/sizeZ ,weight);
 	}
     }
 
   //
-  // 2d 
-  h_ToTvsED->Fill(ED, ToT, weight);
+  // 2D
+  if(nED==1)
+    {
+      h_ToTvsED->Fill(ED, ToT, weight);
+      if(sizeZ>0)
+	{
+	  h_ToTmaxvsEDmaxnorm->Fill(EDmax/sizeZ, ToTmax, weight);
+	  h_ToTminvsEDminnorm->Fill(EDmin/sizeZ, ToTmin, weight);
+	}
+    }
 }
 
 void ClusterHists::execute(const std::vector<int>& rdo_tot, double weight)
