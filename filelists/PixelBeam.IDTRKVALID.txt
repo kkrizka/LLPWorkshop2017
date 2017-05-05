@@ -1,0 +1,2 @@
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/data16_13TeV.00299315.calibration_PixelBeam.recon.DAOD_IDTRKVALID.r8077/DAOD_IDTRKVALID.08695289._000146.pool.root.1
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/DAOD_IDTRKVALID/data16_13TeV.00299315.calibration_PixelBeam.recon.DAOD_IDTRKVALID.r8077/DAOD_IDTRKVALID.08695289._000443.pool.root.1

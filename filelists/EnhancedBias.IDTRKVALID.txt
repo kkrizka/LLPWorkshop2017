@@ -1,0 +1,4 @@
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632/DAOD_IDTRKVALID.3.pool.root
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632/DAOD_IDTRKVALID.5.pool.root
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632/DAOD_IDTRKVALID.1.pool.root
+/global/projecta/projectdirs/atlas/spgriso/data/LLPWorkshop17/scratch/r20p7p8p5PixClusters/output_EnhancedBias_r8631_r8632/DAOD_IDTRKVALID.4.pool.root

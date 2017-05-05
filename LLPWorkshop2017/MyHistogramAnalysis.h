@@ -8,7 +8,7 @@
 #include <TrigConfxAOD/xAODConfigTool.h>
 #include <TrigDecisionTool/TrigDecisionTool.h>
 
-#include <LLPWorkshop2017/ClusterHists.h>
+#include <LLPWorkshop2017/PixelClusterHists.h>
 
 #include <TH1.h>
 
@@ -55,21 +55,21 @@ private:
 
   //
   // Histograms
-  ClusterHists *h_IBL; //!
-  ClusterHists *h_IBL_eta_module[20]; //!
-  ClusterHists *h_IBL_abseta_module[10]; //!
+  PixelClusterHists *h_IBL; //!
+  PixelClusterHists *h_IBL_eta_module[20]; //!
+  PixelClusterHists *h_IBL_abseta_module[10]; //!
 
-  ClusterHists *h_perIBLchip; //!
-  ClusterHists *h_perIBLchip_eta_module[20]; //!
-  ClusterHists *h_perIBLchip_abseta_module[10]; //!
+  PixelClusterHists *h_perIBLchip; //!
+  PixelClusterHists *h_perIBLchip_eta_module[20]; //!
+  PixelClusterHists *h_perIBLchip_abseta_module[10]; //!
 
-  ClusterHists *h_RHad_IBL; //!
-  ClusterHists *h_RHad_IBL_eta_module[20]; //!
-  ClusterHists *h_RHad_IBL_abseta_module[10]; //!
+  PixelClusterHists *h_RHad_IBL; //!
+  PixelClusterHists *h_RHad_IBL_eta_module[20]; //!
+  PixelClusterHists *h_RHad_IBL_abseta_module[10]; //!
 
-  ClusterHists *h_nonRHad_IBL; //!
-  ClusterHists *h_nonRHad_IBL_eta_module[20]; //!
-  ClusterHists *h_nonRHad_IBL_abseta_module[10]; //!
+  PixelClusterHists *h_nonRHad_IBL; //!
+  PixelClusterHists *h_nonRHad_IBL_eta_module[20]; //!
+  PixelClusterHists *h_nonRHad_IBL_abseta_module[10]; //!
 
   TH1 *h_nRhadron; //!
   TH1 *h_nChRhadron; //!

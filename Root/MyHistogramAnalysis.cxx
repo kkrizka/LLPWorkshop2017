@@ -59,16 +59,16 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   wk()->addOutput(m_histEventCount);
 
   // Interesting histograms
-  h_IBL=new ClusterHists("IBL");
-  h_IBL->initialize();
+  h_IBL=new PixelClusterHists("IBL/");
+  ANA_CHECK(h_IBL->initialize());
   h_IBL->record(wk());
 
   std::stringstream ss_name;
   for(int i=-10; i<=9; i++)
     {
-      ss_name << "IBL_eta_module_" << i;
-      ClusterHists *IBL_eta_module=new ClusterHists(ss_name.str());
-      IBL_eta_module->initialize();
+      ss_name << "IBL_eta_module_" << i << "/";
+      PixelClusterHists *IBL_eta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(IBL_eta_module->initialize());
       IBL_eta_module->record(wk());
       h_IBL_eta_module[i+10]=IBL_eta_module;
       ss_name.str("");
@@ -76,9 +76,9 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   
   for(int i=0; i<=9; i++)
     {
-      ss_name << "IBL_abseta_module_" << i;
-      ClusterHists *IBL_abseta_module=new ClusterHists(ss_name.str());
-      IBL_abseta_module->initialize();
+      ss_name << "IBL_abseta_module_" << i << "/";
+      PixelClusterHists *IBL_abseta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(IBL_abseta_module->initialize())
       IBL_abseta_module->record(wk());
       h_IBL_abseta_module[i]=IBL_abseta_module;
       ss_name.str("");
@@ -86,15 +86,15 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
 
   //
   // per pixel chip
-  h_perIBLchip=new ClusterHists("perIBLchip");
-  h_perIBLchip->initialize();
+  h_perIBLchip=new PixelClusterHists("perIBLchip/");
+  ANA_CHECK(h_perIBLchip->initialize());
   h_perIBLchip->record(wk());
 
   for(int i=-10; i<=9; i++)
     {
       ss_name << "perIBLchip_eta_module_" << i;
-      ClusterHists *perIBLchip_eta_module=new ClusterHists(ss_name.str());
-      perIBLchip_eta_module->initialize();
+      PixelClusterHists *perIBLchip_eta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(perIBLchip_eta_module->initialize());
       perIBLchip_eta_module->record(wk());
       h_perIBLchip_eta_module[i+10]=perIBLchip_eta_module;
       ss_name.str("");
@@ -103,8 +103,8 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   for(int i=0; i<=9; i++)
     {
       ss_name << "perIBLchip_abseta_module_" << i;
-      ClusterHists *perIBLchip_abseta_module=new ClusterHists(ss_name.str());
-      perIBLchip_abseta_module->initialize();
+      PixelClusterHists *perIBLchip_abseta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(perIBLchip_abseta_module->initialize());
       perIBLchip_abseta_module->record(wk());
       h_perIBLchip_abseta_module[i]=perIBLchip_abseta_module;
       ss_name.str("");
@@ -112,15 +112,15 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
 
   //
   // matched to track
-  h_RHad_IBL=new ClusterHists("RHad_IBL");
-  h_RHad_IBL->initialize();
+  h_RHad_IBL=new PixelClusterHists("RHad_IBL");
+  ANA_CHECK(h_RHad_IBL->initialize());
   h_RHad_IBL->record(wk());
 
   for(int i=-10; i<=9; i++)
     {
       ss_name << "RHad_IBL_eta_module_" << i;
-      ClusterHists *RHad_IBL_eta_module=new ClusterHists(ss_name.str());
-      RHad_IBL_eta_module->initialize();
+      PixelClusterHists *RHad_IBL_eta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(RHad_IBL_eta_module->initialize());
       RHad_IBL_eta_module->record(wk());
       h_RHad_IBL_eta_module[i+10]=RHad_IBL_eta_module;
       ss_name.str("");
@@ -129,8 +129,8 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   for(int i=0; i<=9; i++)
     {
       ss_name << "RHad_IBL_abseta_module_" << i;
-      ClusterHists *RHad_IBL_abseta_module=new ClusterHists(ss_name.str());
-      RHad_IBL_abseta_module->initialize();
+      PixelClusterHists *RHad_IBL_abseta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(RHad_IBL_abseta_module->initialize());
       RHad_IBL_abseta_module->record(wk());
       h_RHad_IBL_abseta_module[i]=RHad_IBL_abseta_module;
       ss_name.str("");
@@ -138,15 +138,15 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
 
   //
   // matched to track
-  h_nonRHad_IBL=new ClusterHists("nonRHad_IBL");
-  h_nonRHad_IBL->initialize();
+  h_nonRHad_IBL=new PixelClusterHists("nonRHad_IBL");
+  ANA_CHECK(h_nonRHad_IBL->initialize());
   h_nonRHad_IBL->record(wk());
 
   for(int i=-10; i<=9; i++)
     {
       ss_name << "nonRHad_IBL_eta_module_" << i;
-      ClusterHists *nonRHad_IBL_eta_module=new ClusterHists(ss_name.str());
-      nonRHad_IBL_eta_module->initialize();
+      PixelClusterHists *nonRHad_IBL_eta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(nonRHad_IBL_eta_module->initialize());
       nonRHad_IBL_eta_module->record(wk());
       h_nonRHad_IBL_eta_module[i+10]=nonRHad_IBL_eta_module;
       ss_name.str("");
@@ -155,8 +155,8 @@ EL::StatusCode MyHistogramAnalysis :: histInitialize ()
   for(int i=0; i<=9; i++)
     {
       ss_name << "nonRHad_IBL_abseta_module_" << i;
-      ClusterHists *nonRHad_IBL_abseta_module=new ClusterHists(ss_name.str());
-      nonRHad_IBL_abseta_module->initialize();
+      PixelClusterHists *nonRHad_IBL_abseta_module=new PixelClusterHists(ss_name.str());
+      ANA_CHECK(nonRHad_IBL_abseta_module->initialize());
       nonRHad_IBL_abseta_module->record(wk());
       h_nonRHad_IBL_abseta_module[i]=nonRHad_IBL_abseta_module;
       ss_name.str("");
@@ -363,7 +363,7 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
     }
 
   //
-  // Cluster histograms
+  // PixelCluster histograms
   //std::cout << "CLUSTER HISTOGRAMS" << std::endl;
   const xAOD::TrackMeasurementValidationContainer* clusters=0;
   ANA_CHECK(m_event->retrieve(clusters, "PixelClusters"));
@@ -378,7 +378,6 @@ EL::StatusCode MyHistogramAnalysis :: execute ()
       eta_module=a_eta_module(*cluster);
       abseta_module=(eta_module>=0)?eta_module:-eta_module-1;
       nRDO=a_nRDO(*cluster);
-
       clustersIn[10+eta_module][phi_module].push_back(cluster);
 
       if(nRDO<=3) continue;
@@ -530,21 +529,21 @@ EL::StatusCode MyHistogramAnalysis :: finalize ()
 
   //
   // Cleanup histograms
-  h_IBL->finalize();
-  for(int i=-10; i<=9; i++) h_IBL_eta_module[i+10]->finalize();
-  for(int i=0; i<=9; i++) h_IBL_abseta_module[i]->finalize();
+  ANA_CHECK(h_IBL->finalize()); delete h_IBL;
+  for(int i=-10; i<=9; i++) { ANA_CHECK(h_IBL_eta_module[i+10]->finalize()); delete h_IBL_eta_module[i+10]; }
+  for(int i=0; i<=9; i++) { ANA_CHECK(h_IBL_abseta_module[i]->finalize()); delete h_IBL_abseta_module[i]; }
 
-  h_perIBLchip->finalize();
-  for(int i=-10; i<=9; i++) h_perIBLchip_eta_module[i+10]->finalize();
-  for(int i=0; i<=9; i++) h_perIBLchip_abseta_module[i]->finalize();
+  ANA_CHECK(h_perIBLchip->finalize()); delete h_perIBLchip;
+  for(int i=-10; i<=9; i++) { ANA_CHECK(h_perIBLchip_eta_module[i+10]->finalize()); delete h_perIBLchip_eta_module[i+10]; }
+  for(int i=0; i<=9; i++) { ANA_CHECK(h_perIBLchip_abseta_module[i]->finalize()); delete h_perIBLchip_abseta_module[i]; }
 
-  h_RHad_IBL->finalize();
-  for(int i=-10; i<=9; i++) h_RHad_IBL_eta_module[i+10]->finalize();
-  for(int i=0; i<=9; i++) h_RHad_IBL_abseta_module[i]->finalize();
+  ANA_CHECK(h_RHad_IBL->finalize()); delete h_RHad_IBL;
+  for(int i=-10; i<=9; i++) { ANA_CHECK(h_RHad_IBL_eta_module[i+10]->finalize()); delete h_RHad_IBL_eta_module[i+10]; }
+  for(int i=0; i<=9; i++) { ANA_CHECK(h_RHad_IBL_abseta_module[i]->finalize()); delete h_RHad_IBL_abseta_module[i]; }
 
-  h_nonRHad_IBL->finalize();
-  for(int i=-10; i<=9; i++) h_nonRHad_IBL_eta_module[i+10]->finalize();
-  for(int i=0; i<=9; i++) h_nonRHad_IBL_abseta_module[i]->finalize();
+  ANA_CHECK(h_nonRHad_IBL->finalize()); delete h_nonRHad_IBL;
+  for(int i=-10; i<=9; i++) { ANA_CHECK(h_nonRHad_IBL_eta_module[i+10]->finalize()); delete h_nonRHad_IBL_eta_module[i+10]; }
+  for(int i=0; i<=9; i++) { ANA_CHECK(h_nonRHad_IBL_abseta_module[i]->finalize()); delete h_nonRHad_IBL_abseta_module[i]; }
 
   return EL::StatusCode::SUCCESS;
 }
